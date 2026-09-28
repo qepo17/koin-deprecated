@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if pg_isready --quiet --host=127.0.0.1 --port=5432 --dbname=koin --username=koin; then
+  exit 0
+fi
+
+echo "PostgreSQL is not ready; starting it."
+sudo systemctl start postgresql
+
+for _ in {1..8}; do
+  if pg_isready --quiet --host=127.0.0.1 --port=5432 --dbname=koin --username=koin; then
+    echo "PostgreSQL is ready."
+    exit 0
+  fi
+  sleep 1
+done
+
+echo "PostgreSQL did not become ready within 8 seconds." >&2
+exit 1

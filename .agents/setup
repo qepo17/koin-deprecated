@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+step() {
+  local label="$1"
+  shift
+
+  echo
+  echo "==> ${label}"
+  time "$@"
+}
+
+install_postgres() {
+  if dpkg-query -W -f='${Status}' postgresql 2>/dev/null | grep -Fq 'install ok installed'; then
+    echo "PostgreSQL is already installed."
+    return
+  fi
+
+  sudo apt-get update
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-client
+}
+
+configure_postgres() {
+  local config
+  local changed=0
+
+  while IFS= read -r config; do
+    if ! grep -Fq '# Koin orb development settings' "$config"; then
+      sudo tee -a "$config" >/dev/null <<'EOF'
+
+# Koin orb development settings
+fsync = off
+synchronous_commit = off
+full_page_writes = off
+EOF
+      changed=1
+    fi
+  done < <(find /etc/postgresql -path '*/main/postgresql.conf' -type f -print)
+
+  if (( changed )); then
+    sudo systemctl restart postgresql
+  elif ! systemctl is-active --quiet postgresql; then
+    sudo systemctl start postgresql
+  fi
+  if ! systemctl is-enabled --quiet postgresql; then
+    sudo systemctl enable postgresql >/dev/null
+  fi
+
+  sudo -u postgres psql --set=ON_ERROR_STOP=1 --dbname=postgres <<'SQL'
+SELECT 'CREATE ROLE koin LOGIN PASSWORD ''koin'''
+WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'koin') \gexec
+ALTER ROLE koin WITH LOGIN PASSWORD 'koin';
+
+SELECT 'CREATE ROLE test LOGIN PASSWORD ''test'''
+WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'test') \gexec
+ALTER ROLE test WITH LOGIN PASSWORD 'test';
+
+SELECT 'CREATE DATABASE koin OWNER koin'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'koin') \gexec
+
+SELECT 'CREATE DATABASE koin_test OWNER test'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'koin_test') \gexec
+SQL
+}
+
+write_local_env() {
+  if [[ -f .env ]]; then
+    echo ".env already exists; leaving it unchanged."
+    return
+  fi
+
+  cat >.env <<'EOF'
+# Local-only defaults for Amp orbs. This file is ignored by Git.
+DATABASE_URL=postgresql://koin:koin@localhost:5432/koin
+PORT=3000
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=anthropic/claude-sonnet-4
+EOF
+}
+
+command -v bun >/dev/null || {
+  echo "Bun is required but was not found in the orb base image." >&2
+  exit 1
+}
+
+step "Install backend dependencies" bun install --frozen-lockfile
+step "Install frontend dependencies" bun install --cwd web --frozen-lockfile
+step "Install PostgreSQL when missing" install_postgres
+step "Configure local PostgreSQL" configure_postgres
+step "Apply local database migrations" env DATABASE_URL=postgresql://koin:koin@localhost:5432/koin bun run db:migrate
+step "Create local environment file" write_local_env
+
+echo
+echo "Orb setup complete."

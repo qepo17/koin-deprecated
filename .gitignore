@@ -23,3 +23,6 @@ Thumbs.db
 
 # Bun
 bun.lockb
+
+# Amp portal manifests
+.amp/portals/*
