@@ -1,106 +1,183 @@
-import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import {
+  ArrowLeftRight,
+  Eye,
+  EyeOff,
+  House,
+  LogOut,
+  Menu,
+  ReceiptText,
+  Repeat2,
+  Scale,
+  Settings,
+  Sparkles,
+  Tags,
+  X,
+} from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { usePrivacy } from "../hooks/usePrivacy";
-import { AIAssistant, AIAssistantButton } from "./AIAssistant";
+import { AIAssistant } from "./AIAssistant";
 import type { ReactNode } from "react";
 
 const navItems = [
-  { to: "/", label: "Dashboard" },
-  { to: "/transactions", label: "Transactions" },
-  { to: "/categories", label: "Categories" },
-  { to: "/rules", label: "Rules" },
-  { to: "/debts", label: "Debts" },
-  { to: "/subscriptions", label: "Subscriptions" },
-  { to: "/settings", label: "Settings" },
+  { to: "/", label: "Dashboard", icon: House },
+  { to: "/transactions", label: "Transactions", icon: ArrowLeftRight },
+  { to: "/categories", label: "Categories", icon: Tags },
+  { to: "/rules", label: "Rules", icon: Sparkles },
+  { to: "/debts", label: "Debts", icon: Scale },
+  { to: "/subscriptions", label: "Subscriptions", icon: Repeat2 },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
+
+const primaryNavItems = navItems.filter(({ to }) =>
+  ["/", "/transactions", "/debts"].includes(to)
+);
+
+const secondaryNavItems = navItems.filter(({ to }) =>
+  !["/", "/transactions", "/debts"].includes(to)
+);
 
 export function Layout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth();
   const { privacyMode, togglePrivacy, isLoading: privacyLoading } = usePrivacy();
   const navigate = useNavigate();
+  const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
   const [showAI, setShowAI] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0 });
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await logout();
     navigate({ to: "/login" });
   };
 
+  const isMoreActive = secondaryNavItems.some(
+    ({ to }) => location.pathname === to
+  );
+
+  const displayName = user?.name || user?.email || "Account";
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🪙</span>
-              <span className="text-xl font-semibold text-gray-900">Koin</span>
-            </div>
+    <div className="app-frame">
+      <div className="app-shell">
+        <header className="app-header">
+          <Link to="/" className="app-brand" aria-label="Koin dashboard">
+            <span className="app-brand-mark">K</span>
+            <span>
+              <span className="app-brand-name">Koin</span>
+              <span className="app-brand-kicker">Money, made clear</span>
+            </span>
+          </Link>
 
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center gap-6">
-              {navItems.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className="text-gray-600 hover:text-gray-900 font-medium"
-                  activeProps={{ className: "text-emerald-600" }}
+          <div className="app-header-actions">
+            <button
+              onClick={togglePrivacy}
+              disabled={privacyLoading}
+              className={`icon-button ${privacyMode ? "is-active" : ""}`}
+              title={privacyMode ? "Show financial values" : "Hide financial values"}
+              aria-label={privacyMode ? "Show financial values" : "Hide financial values"}
+            >
+              {privacyMode ? <EyeOff size={19} /> : <Eye size={19} />}
+            </button>
+            <button
+              onClick={() => setShowMore(true)}
+              className="profile-button"
+              aria-label={`Open menu for ${displayName}`}
+            >
+              {displayName.slice(0, 1).toUpperCase()}
+            </button>
+          </div>
+        </header>
+
+        <main ref={mainRef} className="app-main">
+          {children}
+        </main>
+
+        <nav className="app-bottom-nav" aria-label="Primary navigation">
+          {primaryNavItems.map(({ to, label, icon: Icon }) => (
+            <Link
+              key={to}
+              to={to}
+              className="bottom-nav-item"
+              activeProps={{ className: "bottom-nav-item is-active" }}
+            >
+              <Icon size={20} strokeWidth={2.1} />
+              <span>{label === "Transactions" ? "Activity" : label}</span>
+            </Link>
+          ))}
+          <button
+            type="button"
+            className={`bottom-nav-item ${isMoreActive ? "is-active" : ""}`}
+            onClick={() => setShowMore(true)}
+          >
+            <Menu size={20} strokeWidth={2.1} />
+            <span>More</span>
+          </button>
+        </nav>
+
+        {showMore && (
+          <div className="menu-overlay" role="dialog" aria-modal="true" aria-label="Navigation menu">
+            <button
+              className="menu-scrim"
+              onClick={() => setShowMore(false)}
+              aria-label="Close navigation menu"
+            />
+            <div className="more-sheet">
+              <div className="sheet-grabber" />
+              <div className="more-sheet-header">
+                <div>
+                  <p className="eyebrow">Your workspace</p>
+                  <h2>{displayName}</h2>
+                </div>
+                <button
+                  className="icon-button"
+                  onClick={() => setShowMore(false)}
+                  aria-label="Close menu"
                 >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+                  <X size={20} />
+                </button>
+              </div>
 
-            {/* User menu */}
-            <div className="flex items-center gap-4">
-              {/* Privacy Toggle */}
-              <button
-                onClick={togglePrivacy}
-                disabled={privacyLoading}
-                className={`
-                  p-2 rounded-lg transition-colors
-                  ${privacyMode 
-                    ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" 
-                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"}
-                  ${privacyLoading ? "opacity-50 cursor-not-allowed" : ""}
-                `}
-                title={privacyMode ? "Privacy mode is on - Click to disable" : "Privacy mode is off - Click to enable"}
-              >
-                {privacyMode ? (
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                  </svg>
-                ) : (
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                )}
-              </button>
+              <div className="more-grid">
+                {secondaryNavItems.map(({ to, label, icon: Icon }) => (
+                  <Link
+                    key={to}
+                    to={to}
+                    className="more-link"
+                    activeProps={{ className: "more-link is-active" }}
+                    onClick={() => setShowMore(false)}
+                  >
+                    <span className="more-link-icon"><Icon size={21} /></span>
+                    <span>{label}</span>
+                  </Link>
+                ))}
+                <button
+                  className="more-link"
+                  onClick={() => {
+                    setShowMore(false);
+                    setShowAI(true);
+                  }}
+                >
+                  <span className="more-link-icon"><ReceiptText size={21} /></span>
+                  <span>Ask Koin</span>
+                </button>
+              </div>
 
-              <span className="text-sm text-gray-600">
-                {user?.name || user?.email}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="text-sm text-gray-500 hover:text-gray-700"
-              >
-                Logout
+              <button className="logout-button" onClick={handleLogout}>
+                <LogOut size={18} />
+                Log out
               </button>
             </div>
           </div>
-        </div>
-      </header>
+        )}
 
-      {/* Main content */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {children}
-      </main>
-
-      {/* AI Assistant */}
-      <AIAssistantButton onClick={() => setShowAI(true)} />
-      <AIAssistant isOpen={showAI} onClose={() => setShowAI(false)} />
+        <AIAssistant isOpen={showAI} onClose={() => setShowAI(false)} />
+      </div>
     </div>
   );
 }

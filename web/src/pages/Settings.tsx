@@ -145,8 +145,13 @@ export function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+    <div className="mobile-page settings-page space-y-6">
+      <div className="page-header">
+        <div className="page-header-copy">
+          <p className="eyebrow">Personalize Koin</p>
+          <h1>Settings</h1>
+        </div>
+      </div>
 
       {/* Preferences */}
       <div className="bg-white rounded-lg shadow p-6">

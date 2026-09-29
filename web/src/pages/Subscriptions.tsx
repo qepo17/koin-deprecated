@@ -264,7 +264,7 @@ function SubscriptionCard({ subscription, categories, onEdit }: {
   const isUpcoming = nextBilling.getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000; // Within 7 days
 
   return (
-    <div className={`bg-white rounded-lg border p-4 ${
+    <div className={`subscription-card bg-white rounded-lg border p-4 ${
       subscription.status === "paused" ? "opacity-75" : ""
     } ${subscription.status === "cancelled" ? "opacity-50" : ""}`}>
       <div className="flex items-start justify-between mb-2">
@@ -429,21 +429,25 @@ export function SubscriptionsPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="mobile-page subscriptions-page">
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">Subscriptions</h1>
+        <div className="page-header">
+          <div className="page-header-copy">
+            <p className="eyebrow">Recurring spend</p>
+            <h1>Subscriptions</h1>
+          </div>
           <button
             onClick={handleAddClick}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="primary-action"
           >
-            ➕ Add Subscription
+            <span aria-hidden="true">＋</span>
+            <span className="action-label">Add subscription</span>
           </button>
         </div>
 
         {/* Summary Cards */}
         {summary && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="subscription-summary-grid grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-white rounded-lg border p-4">
               <h3 className="text-sm font-medium text-gray-500">Monthly Total</h3>
               <p className="text-2xl font-bold text-gray-900">
@@ -464,7 +468,7 @@ export function SubscriptionsPage() {
         )}
 
         {/* Filters */}
-        <div className="flex gap-4 mb-4">
+        <div className="filter-card flex gap-3 mb-4">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -491,7 +495,7 @@ export function SubscriptionsPage() {
 
       {/* Subscriptions Grid */}
       {subscriptions.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="subscription-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {subscriptions.map((subscription) => (
             <SubscriptionCard
               key={subscription.id}
@@ -502,7 +506,7 @@ export function SubscriptionsPage() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
+        <div className="empty-state text-center py-12">
           <div className="text-gray-500 mb-4">
             {statusFilter === "active" 
               ? "No active subscriptions found."

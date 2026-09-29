@@ -102,15 +102,18 @@ export function DashboardPage() {
   };
 
   return (
-    <div>
+    <div className="mobile-page dashboard-page">
       {/* Header with date picker */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 relative z-10">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+      <div className="page-header relative z-10">
+        <div className="page-header-copy">
+          <p className="eyebrow">Overview</p>
+          <h1>Dashboard</h1>
+        </div>
         <DateRangePicker value={dateRange} onChange={setDateRange} />
       </div>
 
       {/* Stats Cards */}
-      <div className={`grid grid-cols-1 gap-6 mb-8 ${stats?.adjustments ? "md:grid-cols-4" : "md:grid-cols-3"}`}>
+      <div className={`stats-grid grid grid-cols-1 gap-6 mb-8 ${stats?.adjustments ? "md:grid-cols-4" : "md:grid-cols-3"}`}>
         <StatCard
           title="Income"
           value={stats?.income ?? 0}
@@ -161,7 +164,7 @@ export function DashboardPage() {
       )}
 
       {/* Balance Trend Chart */}
-      <div className="bg-white rounded-lg shadow p-6 mb-8">
+      <div className="chart-card bg-white rounded-lg shadow p-6 mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Balance Trend</h2>
         <BalanceTrendChart
           data={trendPoints}
@@ -171,8 +174,8 @@ export function DashboardPage() {
       </div>
 
       {/* Charts Row: Income/Expense + Category Donut */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
+      <div className="chart-grid grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="chart-card bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Income vs Expenses</h2>
           <IncomeExpenseChart
             data={trendPoints}
@@ -180,7 +183,7 @@ export function DashboardPage() {
             isLoading={trendLoading}
           />
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="chart-card bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Spending by Category</h2>
           <CategoryDonutChart
             data={stats?.byCategory ?? []}

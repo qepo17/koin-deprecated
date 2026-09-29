@@ -36,19 +36,19 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <span className="text-5xl">🪙</span>
-          <h1 className="mt-4 text-3xl font-bold text-gray-900">
+    <div className="auth-shell">
+      <div className="auth-container">
+        <div className="auth-intro">
+          <span className="auth-logo">K</span>
+          <h1>
             Create account
           </h1>
-          <p className="mt-2 text-gray-600">Start managing your finances</p>
+          <p>Build a calmer relationship with your money.</p>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-md rounded-lg p-8"
+          className="auth-card"
         >
           {error && (
             <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
