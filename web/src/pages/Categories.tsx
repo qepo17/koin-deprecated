@@ -33,17 +33,21 @@ export function CategoriesPage() {
   const cats = catList?.data ?? [];
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
+    <div className="mobile-page categories-page">
+      <div className="page-header">
+        <div className="page-header-copy">
+          <p className="eyebrow">Organize spending</p>
+          <h1>Categories</h1>
+        </div>
         <button
           onClick={() => {
             setShowForm(true);
             setEditingId(null);
           }}
-          className="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700"
+          className="primary-action"
         >
-          Add Category
+          <span aria-hidden="true">＋</span>
+          <span className="action-label">Add category</span>
         </button>
       </div>
 
@@ -64,15 +68,15 @@ export function CategoriesPage() {
       {isLoading ? (
         <div className="text-center text-gray-500">Loading...</div>
       ) : cats.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">
+        <div className="empty-state bg-white rounded-lg shadow p-6 text-center text-gray-500">
           No categories yet. Click "Add Category" to create one.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="category-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {cats.map((cat) => (
             <div
               key={cat.id}
-              className="bg-white rounded-lg shadow p-4 flex items-start gap-3"
+              className="category-card bg-white rounded-lg shadow p-4 flex items-start gap-3"
             >
               <div
                 className="w-4 h-4 rounded-full mt-1 flex-shrink-0"

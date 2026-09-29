@@ -94,17 +94,21 @@ export function RulesPage() {
   const catsMap = new Map((catList?.data ?? []).map((c) => [c.id, c]));
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Rules</h1>
+    <div className="mobile-page rules-page">
+      <div className="page-header">
+        <div className="page-header-copy">
+          <p className="eyebrow">Automations</p>
+          <h1>Rules</h1>
+        </div>
         <button
           onClick={() => {
             setShowForm(true);
             setEditingId(null);
           }}
-          className="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700"
+          className="primary-action"
         >
-          Add Rule
+          <span aria-hidden="true">＋</span>
+          <span className="action-label">Add rule</span>
         </button>
       </div>
 
@@ -148,7 +152,7 @@ export function RulesPage() {
       {isLoading ? (
         <div className="text-center text-gray-500">Loading...</div>
       ) : allRules.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">
+        <div className="empty-state bg-white rounded-lg shadow p-6 text-center text-gray-500">
           No rules yet. Click "Add Rule" to create one.
         </div>
       ) : (
@@ -158,9 +162,9 @@ export function RulesPage() {
             return (
               <div
                 key={rule.id}
-                className={`bg-white rounded-lg shadow p-4 ${!rule.enabled ? "opacity-60" : ""}`}
+                className={`rule-card bg-white rounded-lg shadow p-4 ${!rule.enabled ? "opacity-60" : ""}`}
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="rule-card-top flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="font-medium text-gray-900">{rule.name}</h3>
@@ -191,7 +195,7 @@ export function RulesPage() {
                       ))}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="rule-actions flex items-center gap-2 flex-shrink-0">
                     {/* Toggle */}
                     <button
                       onClick={() =>
@@ -465,7 +469,7 @@ function ConditionEditor({
   };
 
   return (
-    <div className="border border-gray-200 rounded-md p-3 space-y-2 bg-gray-50">
+    <div className="condition-editor border border-gray-200 rounded-md p-3 space-y-2 bg-gray-50">
       <div className="flex items-center gap-2">
         {/* Field selector */}
         <select

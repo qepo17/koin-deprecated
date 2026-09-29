@@ -11,8 +11,8 @@ interface ErrorPageProps {
  */
 export function ErrorPage({ error, onRetry, onGoHome }: ErrorPageProps) {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
+    <div className="auth-shell">
+      <div className="auth-card w-full max-w-md">
         <div className="mb-6 flex items-center justify-center">
           <div className="rounded-full bg-red-100 p-4">
             <AlertTriangle className="h-10 w-10 text-red-600" />

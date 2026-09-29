@@ -103,23 +103,27 @@ export function TransactionsPage() {
   const hasFilters = startDate || endDate || categoryFilter;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Transactions</h1>
+    <div className="mobile-page transactions-page">
+      <div className="page-header">
+        <div className="page-header-copy">
+          <p className="eyebrow">Cash flow</p>
+          <h1>Transactions</h1>
+        </div>
         <button
           onClick={() => {
             setShowForm(true);
             setEditingId(null);
           }}
-          className="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700"
+          className="primary-action"
         >
-          Add Transaction
+          <span aria-hidden="true">＋</span>
+          <span className="action-label">Add transaction</span>
         </button>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <div className="flex flex-wrap gap-4 items-end">
+      <div className="filter-card bg-white rounded-lg shadow p-4 mb-6">
+        <div className="filter-grid flex flex-wrap gap-4 items-end">
           <div>
             <label htmlFor="filter-start-date" className="block text-sm font-medium text-gray-700 mb-1">
               Start Date
@@ -188,7 +192,7 @@ export function TransactionsPage() {
       )}
 
       {/* Transactions List */}
-      <div className="bg-white rounded-lg shadow">
+      <div className="transaction-list bg-white rounded-lg shadow">
         {isLoading ? (
           <div className="p-6 text-center text-gray-500">Loading...</div>
         ) : txs.length === 0 ? (
@@ -219,7 +223,7 @@ export function TransactionsPage() {
                     {dateTxs.map((tx) => (
                       <li
                         key={tx.id}
-                        className="px-6 py-4 flex items-center justify-between hover:bg-gray-50"
+                        className="transaction-row px-6 py-4 flex items-center justify-between hover:bg-gray-50"
                       >
                         <div className="flex-1">
                           <div className="flex items-center gap-3">

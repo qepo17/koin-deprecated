@@ -86,24 +86,28 @@ export function DebtsPage() {
   const selectedAccount = accounts.find((a) => a.id === selectedAccountId);
 
   return (
-    <div>
+    <div className="mobile-page debts-page">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Debts</h1>
+      <div className="page-header">
+        <div className="page-header-copy">
+          <p className="eyebrow">What you owe</p>
+          <h1>Debts</h1>
+        </div>
         <button
           onClick={() => {
             setEditingAccount(null);
             setShowAccountForm(true);
           }}
-          className="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700"
+          className="primary-action"
         >
-          Add Account
+          <span aria-hidden="true">＋</span>
+          <span className="action-label">Add account</span>
         </button>
       </div>
 
       {/* Summary Cards */}
       {summary && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="debt-summary-grid grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <SummaryCard
             label="Total Debt"
             value={formatCurrency(summary.totalDebt, currency)}
@@ -147,23 +151,23 @@ export function DebtsPage() {
       )}
 
       {/* Two-panel layout: accounts list + detail */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="debt-layout grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Accounts List */}
         <div className="lg:col-span-1">
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Accounts</h2>
           {isLoading ? (
             <div className="text-center text-gray-500">Loading...</div>
           ) : accounts.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">
+            <div className="empty-state bg-white rounded-lg shadow p-6 text-center text-gray-500">
               No debt accounts yet.
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="accounts-scroll space-y-3">
               {accounts.map((account) => (
                 <button
                   key={account.id}
                   onClick={() => setSelectedAccountId(account.id)}
-                  className={`w-full text-left bg-white rounded-lg shadow p-4 hover:ring-2 hover:ring-emerald-300 transition ${
+                  className={`debt-card w-full text-left bg-white rounded-lg shadow p-4 hover:ring-2 hover:ring-emerald-300 transition ${
                     selectedAccountId === account.id ? "ring-2 ring-emerald-500" : ""
                   }`}
                 >
@@ -202,11 +206,11 @@ export function DebtsPage() {
         <div className="lg:col-span-2">
           {selectedAccount ? (
             <div>
-              <div className="flex items-center justify-between mb-3">
+              <div className="debt-detail-header flex items-center justify-between mb-3">
                 <h2 className="text-lg font-semibold text-gray-900">
                   {selectedAccount.name}
                 </h2>
-                <div className="flex gap-2">
+                <div className="debt-actions flex gap-2">
                   <button
                     onClick={() => {
                       setShowDebtForm(true);
@@ -283,11 +287,11 @@ export function DebtsPage() {
                   {accountDebts.map((debt) => (
                     <div
                       key={debt.id}
-                      className={`bg-white rounded-lg shadow p-4 ${
+                      className={`debt-card bg-white rounded-lg shadow p-4 ${
                         debt.status !== "active" ? "opacity-60" : ""
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="debt-card-top flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-gray-900">{debt.name}</span>
                           <DebtTypeBadge type={debt.type} />
@@ -298,7 +302,7 @@ export function DebtsPage() {
                           )}
                         </div>
                         {debt.status === "active" && (
-                          <div className="flex gap-2">
+                          <div className="debt-actions flex gap-2">
                             <button
                               onClick={() => {
                                 setEditingDebt(debt);
@@ -355,7 +359,7 @@ export function DebtsPage() {
               )}
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+            <div className="empty-state bg-white rounded-lg shadow p-8 text-center text-gray-500">
               Select an account to view its debts.
             </div>
           )}
