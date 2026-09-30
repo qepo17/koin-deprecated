@@ -1,4 +1,6 @@
-# 🪙 Koin
+# 🪙 Koin (Deprecated)
+
+> **Deprecated:** This original Koin implementation is no longer maintained and is retained for historical reference. The repository has been renamed to `koin-deprecated`; a new Koin will be built from scratch in a separate repository.
 
 Personal finance tracker built for AI integration.
 
